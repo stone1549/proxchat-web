@@ -54,26 +54,24 @@ export const SettingsDialog: React.FunctionComponent<SettingsDialogProps> = ({
       <Dialog open={visible}>
         <DialogTitle>Settings</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-                min: 0.000001,
-                max: 4828032.0,
-                pattern: /^\d+(\.\d+)?$/,
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <ChatRadiusInput
-                  disabled={isSubmitting}
-                  onBlur={onBlur}
-                  onChange={onChange}
-                  value={value}
-                />
-              )}
-              name="radius"
-            />
-          </DialogContentText>
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+              min: 0.000001,
+              max: 4828032.0,
+              pattern: /^\d+(\.\d+)?$/,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <ChatRadiusInput
+                disabled={isSubmitting}
+                onBlur={onBlur}
+                onChange={onChange}
+                value={value}
+              />
+            )}
+            name="radius"
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={hideDialog}>Cancel</Button>

@@ -57,10 +57,12 @@ export const ChatAppBar: React.FunctionComponent = () => {
           <MenuItem onClick={logout}>Logout</MenuItem>
         </Menu>
       </Toolbar>
-      <SettingsDialog
-        visible={settingsDialogOpen}
-        setVisible={setSettingsDialogOpen}
-      />
+      {settingsDialogOpen && (
+        <SettingsDialog
+          visible={settingsDialogOpen}
+          setVisible={setSettingsDialogOpen}
+        />
+      )}
     </AppBar>
   );
 };

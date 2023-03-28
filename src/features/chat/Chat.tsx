@@ -9,14 +9,12 @@ import { Container, Divider, List, Paper, Theme } from "@mui/material";
 import { AuthContext, AuthContextValue } from "../../App";
 import { ChatBubble } from "./ChatBubble";
 import { ChatAppBar } from "./ChatAppBar";
-import { v4 as uuidv4 } from "uuid";
 import { SettingsContext } from "../settings/context";
 import { useSettings } from "../settings/hooks";
 
 type ChatProps = {};
 
 export const Chat: React.FunctionComponent<ChatProps> = () => {
-  const [id] = useState(uuidv4().toString());
   const { sender } = useContext<AuthContextValue>(AuthContext);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [disableAutoScroll, setDisableAutoScroll] = useState(false);
@@ -29,8 +27,7 @@ export const Chat: React.FunctionComponent<ChatProps> = () => {
     resendMessage,
     error,
     position,
-    radius,
-  } = useChat();
+  } = useChat(radiusInMeters);
 
   const renderItem: renderFunc<Message | PendingMessage> = useMemo(() => {
     return (message) => {
@@ -80,7 +77,7 @@ export const Chat: React.FunctionComponent<ChatProps> = () => {
           resendMessage,
           removePendingMessage,
           position,
-          radiusInMeters: radius,
+          radiusInMeters,
         }}
       >
         <Container sx={styles.chatContainer}>

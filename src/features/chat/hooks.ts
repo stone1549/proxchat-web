@@ -11,11 +11,11 @@ import {
   ServerMessage,
   ServerPayload,
   toClientSendChatMessage,
+  toClientUpdateStateMessage,
   toMessage,
 } from "./protocol";
 import { dateTimeReviver } from "../../utils";
 import { DateTime } from "luxon";
-import { SettingsContext } from "../settings/context";
 
 export const GPS_POLL_MS = 300000;
 
@@ -23,10 +23,9 @@ export type RemovePendingMessageFunc = (clientId: string) => void;
 export type SendMessageFunc = (content: string, position: Location) => void;
 export type ResendMessageFunc = (message: PendingMessage) => void;
 
-export const useChat = () => {
+export const useChat = (radiusInMeters: number) => {
   const [reconnectDelay, setReconnectDelay] = useState(250);
   const [checkConnectionDelay, setCheckConnectionDelay] = useState(15000);
-  const { radiusInMeters } = useContext(SettingsContext);
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [pendingMessages, setPendingMessages] = useState<Array<PendingMessage>>(
     []
@@ -46,6 +45,17 @@ export const useChat = () => {
       ws.current?.close();
     };
   }, []);
+
+  useEffect(() => {
+    if (ws.current && ws.current?.readyState === WebSocket.OPEN && position) {
+      ws.current.send(
+        JSON.stringify(
+          toClientUpdateStateMessage(position, radiusInMeters, token),
+          dateTimeReviver
+        )
+      );
+    }
+  }, [ws, position, radiusInMeters]);
 
   const removePendingMessage = useMemo<RemovePendingMessageFunc>(() => {
     return (clientId: string) => {
