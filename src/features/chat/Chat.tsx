@@ -10,6 +10,8 @@ import { AuthContext, AuthContextValue } from "../../App";
 import { ChatBubble } from "./ChatBubble";
 import { ChatAppBar } from "./ChatAppBar";
 import { v4 as uuidv4 } from "uuid";
+import { SettingsContext } from "../settings/context";
+import { useSettings } from "../settings/hooks";
 
 type ChatProps = {};
 
@@ -18,6 +20,7 @@ export const Chat: React.FunctionComponent<ChatProps> = () => {
   const { sender } = useContext<AuthContextValue>(AuthContext);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [disableAutoScroll, setDisableAutoScroll] = useState(false);
+  const { radiusInMeters, unitSystem, units, setSettings } = useSettings();
   const {
     messages,
     pendingMessages,
@@ -26,6 +29,7 @@ export const Chat: React.FunctionComponent<ChatProps> = () => {
     resendMessage,
     error,
     position,
+    radius,
   } = useChat();
 
   const renderItem: renderFunc<Message | PendingMessage> = useMemo(() => {
@@ -61,30 +65,44 @@ export const Chat: React.FunctionComponent<ChatProps> = () => {
     };
   }, [scrollRef, disableAutoScroll, setDisableAutoScroll]);
 
-  console.log("rendering Chat", id);
   return (
-    <ChatContext.Provider
-      value={{ sendMessage, resendMessage, removePendingMessage, position }}
+    <SettingsContext.Provider
+      value={{
+        radiusInMeters,
+        unitSystem,
+        units,
+        setSettings,
+      }}
     >
-      <Container sx={styles.chatContainer}>
-        <ChatAppBar />
-        <Paper sx={styles.chatPaper}>
-          {error && (
-            <div>
-              <span>{error}</span>
-            </div>
-          )}
-          <List sx={styles.chatLog} onScroll={onScrollChatLog}>
-            {!!messages && (
-              <FlatList list={combinedMessages} renderItem={renderItem} />
+      <ChatContext.Provider
+        value={{
+          sendMessage,
+          resendMessage,
+          removePendingMessage,
+          position,
+          radiusInMeters: radius,
+        }}
+      >
+        <Container sx={styles.chatContainer}>
+          <ChatAppBar />
+          <Paper sx={styles.chatPaper}>
+            {error && (
+              <div>
+                <span>{error}</span>
+              </div>
             )}
-            <div ref={scrollRef} />
-          </List>
-          <Divider />
-          <ChatInput />
-        </Paper>
-      </Container>
-    </ChatContext.Provider>
+            <List sx={styles.chatLog} onScroll={onScrollChatLog}>
+              {!!messages && (
+                <FlatList list={combinedMessages} renderItem={renderItem} />
+              )}
+              <div ref={scrollRef} />
+            </List>
+            <Divider />
+            <ChatInput />
+          </Paper>
+        </Container>
+      </ChatContext.Provider>
+    </SettingsContext.Provider>
   );
 };
 

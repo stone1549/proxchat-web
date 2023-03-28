@@ -14,6 +14,5 @@ export const Secured: React.FunctionComponent<PropsWithChildren> = ({
     }
   }, [navigate, token]);
 
-  console.log("rendering Secured");
   return <>{children}</>;
 };

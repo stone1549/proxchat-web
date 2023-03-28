@@ -11,6 +11,7 @@ export type ChatContextValue = {
   removePendingMessage: RemovePendingMessageFunc;
   resendMessage: ResendMessageFunc;
   position: Location | undefined;
+  radiusInMeters: number;
 };
 
 export const ChatContext = createContext<ChatContextValue>({
@@ -24,4 +25,5 @@ export const ChatContext = createContext<ChatContextValue>({
     throw new Error("default implementation");
   },
   position: undefined,
+  radiusInMeters: 0,
 });

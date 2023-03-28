@@ -1,5 +1,5 @@
 import { Location, Message, PendingMessage } from "../../domain";
-import { delay, isEqual } from "lodash";
+import { isEqual } from "lodash";
 import { useInterval } from "../../hooks";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -15,6 +15,7 @@ import {
 } from "./protocol";
 import { dateTimeReviver } from "../../utils";
 import { DateTime } from "luxon";
+import { SettingsContext } from "../settings/context";
 
 export const GPS_POLL_MS = 300000;
 
@@ -25,7 +26,7 @@ export type ResendMessageFunc = (message: PendingMessage) => void;
 export const useChat = () => {
   const [reconnectDelay, setReconnectDelay] = useState(250);
   const [checkConnectionDelay, setCheckConnectionDelay] = useState(15000);
-  const radiusInMeters = 500000;
+  const { radiusInMeters } = useContext(SettingsContext);
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [pendingMessages, setPendingMessages] = useState<Array<PendingMessage>>(
     []
@@ -39,7 +40,6 @@ export const useChat = () => {
   // the useMemo callback. This is a false positive, because the `reconnect` value is used solely to trigger
   // the creation of a new WebSocket instance.
   useEffect(() => {
-    console.log("Creating new websocket");
     ws.current = new WebSocket("ws://127.0.0.1:9006/ws");
 
     return () => {
@@ -101,7 +101,6 @@ export const useChat = () => {
 
   if (ws.current) {
     ws.current.onopen = () => {
-      console.log("Websocket opened");
       setError("");
       setCheckConnectionDelay(15000);
       setReconnectDelay(250);
@@ -111,10 +110,6 @@ export const useChat = () => {
     };
 
     ws.current.onmessage = (event) => {
-      console.log(
-        "Received message",
-        JSON.stringify(event.data, dateTimeReviver, 2)
-      );
       try {
         const message: ServerMessage<ServerPayload> = JSON.parse(
           event.data,
@@ -166,8 +161,7 @@ export const useChat = () => {
       }
     };
 
-    ws.current.onerror = (event) => {
-      console.log("WebSocket error", event);
+    ws.current.onerror = () => {
       setError("connection error");
       ws.current?.close();
     };
