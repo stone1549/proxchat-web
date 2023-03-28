@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Units, UnitSystems } from "../../utils";
+import { useLocalStorage } from "../../hooks";
 
 export type Settings = {
   unitSystem: UnitSystems;
@@ -8,11 +9,13 @@ export type Settings = {
 };
 
 export const useSettings = () => {
-  const [settings, setSettings] = useState<Settings>({
+  const [storedValue, setValue] = useLocalStorage("settings", {
     unitSystem: UnitSystems.metric,
     units: Units.m,
     radiusInMeters: 100,
   });
+  const [settings, setSettings] = useState<Settings>(storedValue);
+
   const { unitSystem, units, radiusInMeters } = settings;
 
   const setSettingsFunc = (
@@ -21,6 +24,11 @@ export const useSettings = () => {
     radiusInMeters: number
   ) => {
     setSettings({
+      unitSystem,
+      units,
+      radiusInMeters,
+    });
+    setValue({
       unitSystem,
       units,
       radiusInMeters,
