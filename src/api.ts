@@ -1,4 +1,3 @@
-import moment from "moment";
 import { Location, Message } from "./domain";
 
 export class AuthError extends Error {
@@ -92,68 +91,6 @@ export const refreshToken = async (token: string): Promise<TokenResp> => {
   } else {
     const err = await response.json();
     throw new AuthError(err.status, err.message);
-  }
-};
-
-export class ChatError extends Error {
-  public status: number;
-  constructor(status: number, message: string) {
-    super(message);
-    this.status = status;
-    // 👇️ because we are extending a built-in class
-    Object.setPrototypeOf(this, ChatError.prototype);
-  }
-}
-
-export const pollChat = async (
-  position: Location,
-  after: moment.Moment,
-  token: string
-): Promise<Array<Message>> => {
-  const response = await fetch(
-    `${process.env.REACT_APP_MESSAGE_SERVICE_URL}/messages?radius=${
-      process.env.REACT_APP_CHAT_RADIUS
-    }&after=${after.valueOf() + 1}` +
-      `&lat=${position.lat}&long=${position.long}&limit=${process.env.REACT_APP_MESSAGE_LIMIT}`,
-    {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  if (response.ok) {
-    const messages = await response.json();
-    const results: Array<Message> = [];
-    for (const message of messages) {
-      results.push({
-        id: message.id as string,
-        content: message.content as string,
-        sender: {
-          id: message.sender.id as string,
-          username: message.sender.username as string,
-        },
-        location: {
-          long: message.location.long as number,
-          lat: message.location.lat,
-        },
-        createdAt: moment(message.createdAt as moment.Moment),
-        clientId: message.clientId,
-      });
-    }
-
-    return results;
-  } else if (response.status === 401) {
-    const err = await response.json();
-    throw new AuthError(err.status, err.message);
-  } else if (response.status) {
-    const err = await response.json();
-    throw new ChatError(err.status, err.message);
-  } else {
-    throw new ChatError(0, "Uknown error");
   }
 };
 
