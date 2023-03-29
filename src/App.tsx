@@ -12,7 +12,7 @@ import { createTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { useAuth } from "./hooks";
-import { Sender } from "./domain";
+import { Gender, Sender } from "./domain";
 import { Login } from "./features/login/Login";
 import { Signup } from "./features/signup/Signup";
 
@@ -40,10 +40,18 @@ const router = createBrowserRouter([
 export type AuthContextValue = {
   token: string;
   error: string;
+  setError: (message: string) => void;
   sender: Sender;
   login: (email: string, password: string) => void;
   logout: () => void;
-  signup: (email: string, username: string, password: string) => void;
+  signup: (
+    email: string,
+    username: string,
+    password: string,
+    gender: keyof typeof Gender,
+    age: number,
+    topics: Set<string>
+  ) => void;
 };
 
 export const AuthContext = React.createContext<AuthContextValue>({
@@ -62,16 +70,19 @@ export const AuthContext = React.createContext<AuthContextValue>({
   signup: (_: string, __: string, ___: string) => {
     throw new Error(`signup function default`);
   },
+  setError: (_: string) => {
+    throw new Error(`setError function default`);
+  },
 });
 
 export const App = () => {
-  const { token, sender, login, logout, signup, error } = useAuth();
+  const { token, sender, login, logout, signup, error, setError } = useAuth();
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AuthContext.Provider
-          value={{ token, login, logout, sender, signup, error }}
+          value={{ token, login, logout, sender, signup, error, setError }}
         >
           <RouterProvider router={router} />
         </AuthContext.Provider>

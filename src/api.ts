@@ -1,4 +1,4 @@
-import { Location, Message } from "./domain";
+import { Gender, Location, Message } from "./domain";
 
 export class AuthError extends Error {
   public status: number;
@@ -52,13 +52,21 @@ export class SignupError extends Error {
 export const signup = async (
   email: string,
   username: string,
-  password: string
+  password: string,
+  gender: keyof typeof Gender,
+  age: number,
+  topics: Set<string>
 ): Promise<TokenResp> => {
   const response = await fetch(
     `${process.env.REACT_APP_AUTH_SERVICE_URL}/user`,
     {
       method: "PUT",
-      body: JSON.stringify({ email, username, password }),
+      body: JSON.stringify({
+        email,
+        username,
+        password,
+        profile: { gender, age, topics: [...topics] },
+      }),
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

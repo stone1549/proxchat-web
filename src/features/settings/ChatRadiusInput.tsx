@@ -153,7 +153,7 @@ export const ChatRadiusInput: React.FunctionComponent<ChatRadiusInputProps> = ({
         value={savedUnits}
         exclusive
         onChange={onRadiusUnitsChange}
-        aria-label="text alignment"
+        aria-label="text units"
       >
         {unitButtons.map((b) => (
           <ToggleButton value={b.value} key={b.value}>
@@ -167,6 +167,7 @@ export const ChatRadiusInput: React.FunctionComponent<ChatRadiusInputProps> = ({
         value={savedUnitSystem}
         exclusive
         onChange={onRadiusUnitsSystemChange}
+        aria-label="text units system"
       >
         {unitsSystemButtons.map((b) => (
           <ToggleButton value={b.value} key={b.value}>

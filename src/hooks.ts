@@ -4,10 +4,12 @@ import { getSenderFromToken } from "./utils";
 import { AuthContextValue } from "./App";
 import { SettingsContextValue } from "./features/settings/context";
 import { Settings } from "./features/settings/hooks";
+import { Gender } from "./domain";
 
 export const useAuth = (): AuthContextValue => {
   const [token, setToken] = useState("");
   const [error, setError] = useState("");
+
   const loginFunc = useMemo(() => {
     return async (username: string, password: string) => {
       try {
@@ -60,15 +62,30 @@ export const useAuth = (): AuthContextValue => {
   );
 
   const signupFunc = useMemo(() => {
-    return async (email: string, username: string, password: string) => {
+    return async (
+      email: string,
+      username: string,
+      password: string,
+      gender: keyof typeof Gender,
+      age: number,
+      topics: Set<string>
+    ) => {
       try {
-        const { token } = await signup(email, username, password);
+        const { token } = await signup(
+          email,
+          username,
+          password,
+          gender,
+          age,
+          topics
+        );
         setToken(token);
         setError("");
         return;
       } catch (e) {
+        console.error(e);
         if (e instanceof AuthError) {
-          setError(e.message);
+          setError(e.message ? e.message : "unknown error");
           return;
         }
 
@@ -86,6 +103,7 @@ export const useAuth = (): AuthContextValue => {
     error,
     sender,
     signup: signupFunc,
+    setError,
   };
 };
 
